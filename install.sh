@@ -512,9 +512,17 @@ mountopt = "nodev,metacopy=on"
 EOF
 
     # Optimized containers config
-    cat > /etc/containers/containers.conf << 'EOF'
+    # Add Pi Zero optimizations if needed
+    local extra_container_opts=""
+    if [ "$pi_model" = "zero" ] || [ "$pi_model" = "zero2" ] || [ "$pi_model" = "1" ]; then
+        log_info "Applying low-memory device optimizations..."
+        extra_container_opts="image_parallel_copies = 1"
+    fi
+    
+    cat > /etc/containers/containers.conf << EOF
 [containers]
 default_ulimits = ["nofile=1024:2048"]
+${extra_container_opts}
 
 [engine]
 cgroup_manager = "systemd"
@@ -523,12 +531,8 @@ runtime = "crun"
 network_cmd_options = ["enable_ipv6=false"]
 EOF
 
-    # Pi Zero / Pi Zero 2W specific optimizations
+    # Pi Zero / Pi Zero 2W specific optimizations - swap
     if [ "$pi_model" = "zero" ] || [ "$pi_model" = "zero2" ] || [ "$pi_model" = "1" ]; then
-        log_info "Applying low-memory device optimizations..."
-        
-        echo '[containers]' >> /etc/containers/containers.conf
-        echo 'image_parallel_copies = 1' >> /etc/containers/containers.conf
         
         # Add swap if not present
         if [ ! -f /swapfile ] && [ ! -f /var/swap ]; then
