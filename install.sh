@@ -649,12 +649,7 @@ services:
     image: pihole/pihole:latest
     hostname: pihole
     restart: unless-stopped
-    
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      - "80:80/tcp"
+    network_mode: host
     
     environment:
       TZ: '${TIMEZONE}'
@@ -674,10 +669,6 @@ services:
     
     cap_add:
       - NET_ADMIN
-    
-    dns:
-      - 127.0.0.1
-      - ${DNS1}
 EOF
 
     log_info "Configuration file created"
