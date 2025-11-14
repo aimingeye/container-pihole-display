@@ -496,6 +496,18 @@ optimize_podman() {
     
     mkdir -p /etc/containers
     
+    # Configure registries (Docker Hub)
+    cat > /etc/containers/registries.conf << 'EOF'
+[registries.search]
+registries = ['docker.io']
+
+[registries.insecure]
+registries = []
+
+[registries.block]
+registries = []
+EOF
+
     # Optimized storage config
     cat > /etc/containers/storage.conf << 'EOF'
 [storage]
